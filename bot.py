@@ -372,9 +372,10 @@ async def main():
     app.router.add_post("/validate", validate_handler)
     runner = web.AppRunner(app)
     await runner.setup()
-    site = web.TCPSite(runner, "0.0.0.0", 8080)
+    port = int(os.environ.get("PORT", 8080))
+    site = web.TCPSite(runner, "0.0.0.0", port)
     await site.start()
-    print("HTTP server on :8080")
+    print(f"HTTP server on :{port}")
     print("Бот запущен!")
     await dp.start_polling(bot)
 
