@@ -21,6 +21,8 @@ from aiogram.client.default import DefaultBotProperties
 TOKEN = "8744880079:AAH0mSbtSGOmyacq-V0GSXxSUUzl9HgRjaY"
 ADMIN_ID = 8417977802
 VALIDATE_AUTH = os.environ.get("VALIDATE_AUTH", "vanta-internal-2024")
+CARD_NUMBER = "2200 7012 2380 0894"
+CARDHOLDER = "Сергей М."
 
 bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
 dp = Dispatcher()
@@ -153,8 +155,9 @@ async def cb_plan(c: CallbackQuery):
         f"📝 <b>Заявка создана!</b>\n\n"
         f"Тариф: <b>{get_plan_name(plan)}</b>\n"
         f"Цена: <b>{get_plan_price(plan)}</b>\n\n"
-        f"Переведи деньги админу:\n"
-        f"💳 <b>@Vanta_Client</b>\n\n"
+        f"💳 Переведи на карту Т-Банк:\n"
+        f"<code>{CARD_NUMBER}</code>\n"
+        f"Получатель: {CARDHOLDER}\n\n"
         f"После оплаты нажми «Оплатил» — админ проверит и выдаст ключ."
     )
     kb = InlineKeyboardMarkup(inline_keyboard=[
