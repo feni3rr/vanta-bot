@@ -72,7 +72,7 @@ def main_kb():
     return InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="🛒 Купить клиент", callback_data="buy")],
         [InlineKeyboardButton(text="🔑 Проверить лицензию", callback_data="check")],
-        [InlineKeyboardButton(text="💬 Поддержка", url="t.me/Vanta_Client")],
+        [InlineKeyboardButton(text="💬 Поддержка", url="t.me/feni3_r")],
     ])
 
 
@@ -297,7 +297,7 @@ async def cb_approve(c: CallbackQuery):
         f"Введи его в клиенте для активации."
     )
     await bot.send_message(user_id, user_text, reply_markup=InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="🎮 Скачать клиент", url="t.me/Vanta_Client")],
+        [InlineKeyboardButton(text="🎮 Скачать клиент", url="t.me/feni3_r")],
     ]))
 
     await c.message.edit_text(
@@ -318,7 +318,7 @@ async def cb_reject(c: CallbackQuery):
     db.commit()
 
     username = row[0] if row else "unknown"
-    await bot.send_message(user_id, "❌ <b>Оплата не подтверждена.</b>\n\nСвяжись с поддержкой: @Vanta_Client")
+    await bot.send_message(user_id, "❌ <b>Оплата не подтверждена.</b>\n\nСвяжись с поддержкой: @feni3_r")
 
     await c.message.edit_text(f"❌ Отклонено.\nПользователь: @{username}", reply_markup=admin_kb())
     await c.answer("Отклонено")
