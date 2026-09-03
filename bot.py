@@ -56,15 +56,15 @@ def generate_key():
 
 
 def get_plan_days(plan):
-    return {"1m": 30, "3m": 90, "life": 99999}.get(plan, 30)
+    return {"1m": 30, "3m": 90, "life": 99999, "premium": 99999}.get(plan, 30)
 
 
 def get_plan_name(plan):
-    return {"1m": "1 месяц", "3m": "3 месяца", "life": "Навсегда"}.get(plan, plan)
+    return {"1m": "1 месяц", "3m": "3 месяца", "life": "Навсегда", "premium": "Premium навсегда"}.get(plan, plan)
 
 
 def get_plan_price(plan):
-    return {"1m": "50₽", "3m": "110₽", "life": "150₽"}.get(plan, "?")
+    return {"1m": "50₽", "3m": "110₽", "life": "150₽", "premium": "300₽"}.get(plan, "?")
 
 
 # --- Keyboards ---
@@ -81,6 +81,7 @@ def buy_kb():
         [InlineKeyboardButton(text="1 месяц — 50₽", callback_data="plan_1m")],
         [InlineKeyboardButton(text="3 месяца — 110₽", callback_data="plan_3m")],
         [InlineKeyboardButton(text="Навсегда — 150₽", callback_data="plan_life")],
+        [InlineKeyboardButton(text="⭐ Premium навсегда — 300₽", callback_data="plan_premium")],
         [InlineKeyboardButton(text="◀️ Назад", callback_data="back")],
     ])
 
@@ -98,6 +99,7 @@ def admin_kb():
     return InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="📊 Статистика", callback_data="admin_stats")],
         [InlineKeyboardButton(text="🔑 Генерировать ключ", callback_data="admin_gen")],
+        [InlineKeyboardButton(text="⭐ Генерировать Premium", callback_data="admin_gen_premium")],
     ])
 
 
@@ -111,7 +113,8 @@ async def cmd_start(m: Message):
         f"📋 <b>Тарифы:</b>\n"
         f"  • 1 месяц — 50₽\n"
         f"  • 3 месяца — 110₽\n"
-        f"  • Навсегда — 150₽\n\n"
+        f"  • Навсегда — 150₽\n"
+        f"  • ⭐ Premium навсегда — 300₽\n\n"
         f"Выбери действие:"
     )
     await m.answer(text, reply_markup=main_kb())
@@ -135,6 +138,13 @@ async def cb_buy(c: CallbackQuery):
         "  • 1 месяц — 50₽\n"
         "  • 3 месяца — 110₽\n"
         "  • Навсегда — 150₽\n\n"
+        "⭐ <b>Premium (300₽):</b>\n"
+        "  • AttackAura Imba (auto-crit, быстрый CPS)\n"
+        "  • Chams (подсветка сквозь стены)\n"
+        "  • ESP (квадраты на игроках)\n"
+        "  • TargetESP (красивый маркер)\n"
+        "  • Плавные повороты\n"
+        "  • Auto-Shield\n\n"
         "После оплаты админ проверит и выдаст ключ."
     )
     await c.message.edit_text(text, reply_markup=buy_kb())
@@ -259,6 +269,25 @@ async def cb_gen(c: CallbackQuery):
 
     await c.message.edit_text(
         f"🔑 <b>Новый ключ:</b>\n\n<code>{key}</code>\n\nОтправь его пользователю.",
+        reply_markup=admin_kb()
+    )
+    await c.answer()
+
+
+@router.callback_query(F.data == "admin_gen_premium")
+async def cb_gen_premium(c: CallbackQuery):
+    if c.from_user.id != ADMIN_ID:
+        return await c.answer("Нет доступа!", show_alert=True)
+
+    key = generate_key()
+    db.execute(
+        "INSERT INTO licenses (key, user_id, username, plan, created_at, expires_at, active) VALUES (?, ?, ?, ?, ?, ?, 1)",
+        (key, 0, "admin", "premium", datetime.now().isoformat(), (datetime.now() + timedelta(days=99999)).isoformat())
+    )
+    db.commit()
+
+    await c.message.edit_text(
+        f"⭐ <b>Новый Premium ключ:</b>\n\n<code>{key}</code>\n\nОтправь его пользователю.",
         reply_markup=admin_kb()
     )
     await c.answer()
